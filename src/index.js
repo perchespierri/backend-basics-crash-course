@@ -5,8 +5,8 @@ const app = express();
 const PORT = 3333;
 const customers = [];
 
-// MIDDLEWARE
-function verifyCpfInAccount(request, response, next) {
+// MIDDLEWARES
+function verifyCpfExistence(request, response, next) {
   const { cpf } = request.headers;
   const customer = customers.find(customer => customer.cpf === cpf);
   
@@ -18,6 +18,20 @@ function verifyCpfInAccount(request, response, next) {
 
   return next();
 }
+
+function getBalance(statement) {
+  const balance = statement.reduce((acc, operation) => {
+    if(operation.type === "credit") {
+      return acc + operation.amount;
+    } else {
+      return acc - operation.amount
+    }
+  }, 0);
+  
+  return balance;
+} 
+// I know this getBalance function is kind of dumb. I'm just practicing and learning
+// http requests
 
 app.use(express.json())
 
@@ -45,12 +59,48 @@ app.post("/account", (request, response) => {
 });
 
 // ONE WAY TO USE THE MIDDLEWARE IS THIS, SO EVERY NEXT ROUTE USES WILL USE IT:
-// app.use(verifyCpfInAccount);
+// app.use(verifyCpfExistence);
 
 // OTHER WAY IS THIS:
-app.get("/statement/", verifyCpfInAccount, (request, response, next) => {
+app.get("/statement/", verifyCpfExistence, (request, response, next) => {
   const { customer } = request;
   return response.json(customer.statement);
 });
+
+app.post("/deposit", verifyCpfExistence, (request, response, next) => {
+  const { description, amount } = request.body;
+  const { customer } = request;
+  const statementOperation = {
+    description,
+    amount,
+    created_At: new Date(),
+    type: "credit"
+  }
+
+  customer.statement.push(statementOperation);
+
+  return response.status(201).send();
+})
+
+app.post("/withdraw", verifyCpfExistence, (request, response) => {
+  const { amount } = request.body;
+  const { customer } = request;
+
+  const balance = getBalance(customer.statement);
+
+  if (balance < amount) {
+    return response.status(400).json({error: "Insufficient funds"});
+  };
+  
+  const statementOperation = {
+    amount,
+    created_At: new Date(),
+    type: "debit"
+  };
+
+  customer.statement.push(statementOperation);
+  
+  return response.status(201).send();
+})
 
 app.listen(PORT);

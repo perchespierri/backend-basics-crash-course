@@ -1,0 +1,17 @@
+{
+  "name": "finapi",
+  "version": "1.0.0",
+  "description": "Simples API to learn about node",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "express": "^4.17.3"
+  }
+}

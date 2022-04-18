@@ -27,7 +27,7 @@ app.post("/account", (request, response) => {
     statement: []
   });
 
-  return response.status(201).send()
+  return response.status(201).send({message: "ACCOUNT CREATED"})
 });
 
 app.listen(PORT);

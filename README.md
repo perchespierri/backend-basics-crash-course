@@ -1,5 +1,5 @@
-# BACKEND COURSE - ROCKETSEAT
-## FinApi - Financeia
+# BACKEND COURSE
+## FinApi
 We will build a finantial services API.
 
 ## Requisites:

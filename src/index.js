@@ -5,6 +5,20 @@ const app = express();
 const PORT = 3333;
 const customers = [];
 
+// MIDDLEWARE
+function verifyCpfInAccount(request, response, next) {
+  const { cpf } = request.headers;
+  const customer = customers.find(customer => customer.cpf === cpf);
+  
+  if(!customer) {
+    return response.status(400).json({ error: "CUSTOMER NOT FOUND" });
+  }
+
+  request.customer = customer; // creating new key and value inside request object
+
+  return next();
+}
+
 app.use(express.json())
 
 app.post("/account", (request, response) => {
@@ -30,14 +44,12 @@ app.post("/account", (request, response) => {
   return response.status(201).send({message: "ACCOUNT CREATED"})
 });
 
-app.get("/statement/", (request, response) => {
-  const { cpf } = request.headers;
-  const customer = customers.find(customer => customer.cpf === cpf);
+// ONE WAY TO USE THE MIDDLEWARE IS THIS, SO EVERY NEXT ROUTE USES WILL USE IT:
+// app.use(verifyCpfInAccount);
 
-  if(!customer) {
-    return response.status(400).json({ error: "CUSTOMER NOT FOUND" });
-  }
-  
+// OTHER WAY IS THIS:
+app.get("/statement/", verifyCpfInAccount, (request, response, next) => {
+  const { customer } = request;
   return response.json(customer.statement);
 });
 

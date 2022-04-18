@@ -2,6 +2,9 @@
 ## FinApi
 We will build a finantial services API.
 
+## DISCLAIMER:
+This was made for study purposes only. Therefore, it may not follow every good practice there is. For instance, there are comments in parts of the code. Those are for me to remember a few steps or concepts, and would never make it to development or production were this a real project.
+
 ## Requisites:
 - It should be possible to create an account
 - It should be possible to fetch the customer's bank statement
